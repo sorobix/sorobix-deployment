@@ -1,0 +1,34 @@
+version: "3.3"
+
+services:
+
+  traefik:
+    image: "traefik:v2.9"
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  sorobix-api:
+    image: "sorobix-api:latest"
+    container_name: "sorobix-api"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`api.localhost`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
+  
+  sorobix-formatter:
+     image: "sorobix-formatter:latest"
+     container_name: "sorobix-formatter"
+     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.formatter.rule=Host(`formatter.localhost`)"
+      - "traefik.http.routers.formatter.entrypoints=web"
+
