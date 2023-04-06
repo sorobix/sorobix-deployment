@@ -6,29 +6,40 @@ services:
     image: "traefik:v2.9"
     container_name: "traefik"
     command:
+      - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.email=hey@benro.dev"
+      - "--certificatesresolvers.le.acme.storage=/acme.json"
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/acme.json:/acme.json"
 
-  sorobix-api:
-    image: "sorobix-api:latest"
-    container_name: "sorobix-api"
+  sorobix-api-rs:
+    image: "sorobix-api-rs:latest"
+    container_name: "sorobix-api-rs"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`api.localhost`)"
-      - "traefik.http.routers.whoami.entrypoints=web"
-  
+      - traefik.http.routers.whoami.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/api`)
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.whoami.tls.certresolver=le"
+
   sorobix-formatter:
      image: "sorobix-formatter:latest"
      container_name: "sorobix-formatter"
      labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.formatter.rule=Host(`formatter.localhost`)"
-      - "traefik.http.routers.formatter.entrypoints=web"
-
+      - traefik.http.routers.formatter.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/formatter`)
+      - "traefik.http.routers.formatter.entrypoints=websecure"
+      - "traefik.http.routers.formatter.tls=true"
+      - "traefik.http.routers.formatter.tls.certresolver=le"
