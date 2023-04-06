@@ -1,0 +1,3 @@
+[submodule "sorobix-ci"]
+	path = sorobix-ci
+	url = https://github.com/sorobix/sorobix-ci
