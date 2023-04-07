@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Cloning Sorobix-Formatter"
 git clone https://github.com/sorobix/sorobix-formatter
 echo "Cloning Sorobix-API"
