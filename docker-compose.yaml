@@ -32,12 +32,16 @@ services:
   sorobix-api-rs:
     image: "sorobix-api-rs:latest"
     container_name: "sorobix-api-rs"
+    environment:
+      - REDIS=redis:6379
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.whoami.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/api`)
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls=true"
       - "traefik.http.routers.whoami.tls.certresolver=le"
+    depends_on:
+      - redis
 
   sorobix-formatter:
      image: "wasm-handler:latest"
