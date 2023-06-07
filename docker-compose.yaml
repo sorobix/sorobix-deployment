@@ -54,3 +54,5 @@ services:
       - "traefik.http.routers.formatter.entrypoints=websecure"
       - "traefik.http.routers.formatter.tls=true"
       - "traefik.http.routers.formatter.tls.certresolver=le"
+     depends_on:
+      - redis
