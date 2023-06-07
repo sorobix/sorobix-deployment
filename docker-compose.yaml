@@ -24,6 +24,11 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik/acme.json:/acme.json"
 
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+
   sorobix-api-rs:
     image: "sorobix-api-rs:latest"
     container_name: "sorobix-api-rs"
@@ -35,11 +40,17 @@ services:
       - "traefik.http.routers.whoami.tls.certresolver=le"
 
   sorobix-formatter:
-     image: "sorobix-formatter:latest"
-     container_name: "sorobix-formatter"
+     image: "wasm-handler:latest"
+     container_name: "wasm-handler"
+     environment:
+      - WS_PORT=3001
+      - REDIS_HOST=redis:6379
+      - REDIS_PASSWORD=
+      - REDIS_DB=0
+      - REDIS_KEY_LIFETIME=1h
      labels:
       - "traefik.enable=true"
-      - traefik.http.routers.formatter.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/formatter`)
+      - traefik.http.routers.formatter.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/ws`)
       - "traefik.http.routers.formatter.entrypoints=websecure"
       - "traefik.http.routers.formatter.tls=true"
       - "traefik.http.routers.formatter.tls.certresolver=le"
