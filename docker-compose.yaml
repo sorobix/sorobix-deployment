@@ -54,7 +54,7 @@ services:
       - REDIS_KEY_LIFETIME=1h
      labels:
       - "traefik.enable=true"
-      - traefik.http.routers.formatter.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/ws`)
+      - traefik.http.routers.formatter.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/handler`)
       - "traefik.http.routers.formatter.entrypoints=websecure"
       - "traefik.http.routers.formatter.tls=true"
       - "traefik.http.routers.formatter.tls.certresolver=le"
