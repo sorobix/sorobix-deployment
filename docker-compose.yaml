@@ -43,7 +43,7 @@ services:
     depends_on:
       - redis
 
-  sorobix-formatter:
+  wasm-handler:
      image: "wasm-handler:latest"
      container_name: "wasm-handler"
      environment:
@@ -54,9 +54,18 @@ services:
       - REDIS_KEY_LIFETIME=1h
      labels:
       - "traefik.enable=true"
-      - traefik.http.routers.formatter.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/ws`)
+      - traefik.http.routers.handler.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/ws`)
+      - "traefik.http.routers.handler.entrypoints=websecure"
+      - "traefik.http.routers.handler.tls=true"
+      - "traefik.http.routers.handler.tls.certresolver=le"
+     depends_on:
+      - redis
+  sorobix-formatter:
+     image: "sorobix-formatter:latest"
+     container_name: "sorobix-formatter"
+     labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.formatter.rule=Host(`backend.sorobix.xyz`) && PathPrefix(`/formatter`)
       - "traefik.http.routers.formatter.entrypoints=websecure"
       - "traefik.http.routers.formatter.tls=true"
       - "traefik.http.routers.formatter.tls.certresolver=le"
-     depends_on:
-      - redis
